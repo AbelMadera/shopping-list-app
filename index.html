@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping List App</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #ff8fa3;
+        }
+
+        #app {
+            width: 300px;
+            background-color: pink;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 7px rgba(0, 0, 0, 0.1);
+        }
+
+        #itemInput {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        #addItemBtn {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            background-color: #c9184a;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #shoppingList {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .listItem {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .listItem button {
+            background-color: #f44336;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #app h1 {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <h1>Shopping List</h1>
+    <input type="text" id="itemInput" placeholder="Add an item...">
+    <button id="addItemBtn">Add Item</button>
+    <ul id="shoppingList"></ul>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const itemInput = document.getElementById('itemInput');
+        const addItemBtn = document.getElementById('addItemBtn');
+        const shoppingList = document.getElementById('shoppingList');
+
+        addItemBtn.addEventListener('click', function () {
+            const itemName = itemInput.value.trim();
+            if (itemName !== '') {
+                addItem(itemName);
+                saveToLocalStorage();
+                itemInput.value = '';
+            }
+        });
+
+        itemInput.addEventListener('keyup', function (event) {
+            if (event.key === 'Enter') {
+                addItemBtn.click();
+            }
+        });
+
+        function addItem(itemName) {
+            const listItem = document.createElement('li');
+            listItem.className = 'listItem';
+            listItem.innerHTML = `
+                <span>${itemName}</span>
+                <button class="removeBtn">Remove</button>
+            `;
+            shoppingList.appendChild(listItem);
+
+            // Attach event listener to the newly created remove button
+            const removeBtn = listItem.querySelector('.removeBtn');
+            removeBtn.addEventListener('click', function () {
+                removeItem(listItem);
+            });
+        }
+
+        function removeItem(listItem) {
+            shoppingList.removeChild(listItem);
+            saveToLocalStorage();
+        }
+
+        function saveToLocalStorage() {
+            const items = Array.from(document.querySelectorAll('.listItem span')).map(item => item.textContent);
+            localStorage.setItem('shoppingListItems', JSON.stringify(items));
+        }
+
+        function loadFromLocalStorage() {
+            const storedItems = localStorage.getItem('shoppingListItems');
+            if (storedItems) {
+                const items = JSON.parse(storedItems);
+                items.forEach(item => addItem(item));
+            }
+        }
+
+        // Load items from local storage on page load
+        loadFromLocalStorage();
+    });
+</script>
+
+</body>
+</html>
